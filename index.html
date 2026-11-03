@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1554b5">
+  <meta name="description" content="Çalışma saatlerini ve tahmini fazla mesaini takip et.">
+  <title>MesaiMatik | Mesai Takibi</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="#">
+      <span class="brand-icon">M</span>
+      <span>
+        MesaiMatik
+        <small>Çalışma ve kazanç takibi</small>
+      </span>
+    </a>
+    <span class="status">● Kişisel mesai panelin</span>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <p class="eyebrow">KİŞİSEL MESAİ PANELİ</p>
+      <h1>Çalışmanı takip et.<br><span>Kazancını hesapla.</span></h1>
+      <p>Çalışma günlerini kaydet, aylık mesaini ve tahmini kazancını görüntüle.</p>
+    </section>
+
+    <section class="panel" id="settingsPanel">
+      <p class="eyebrow">01 / KİŞİSEL AYARLAR</p>
+      <h2>Çalışma bilgilerini belirle</h2>
+      <p>Bilgilerini kendin gir. Ayarlarını daha sonra değiştirebilirsin.</p>
+
+      <form id="settingsForm">
+        <div class="grid">
+          <label>Maaş tipi
+            <select id="salaryType" required>
+              <option value="">Seç</option>
+              <option value="net">Net maaş</option>
+              <option value="gross">Brüt maaş</option>
+            </select>
+          </label>
+
+          <label>Aylık maaş (₺)
+            <input id="salary" type="number" min="0.01" step="0.01"
+              placeholder="Maaş tutarını gir" required>
+          </label>
+
+          <label>Çalışma düzeni
+            <select id="workMode" required>
+              <option value="">Seç</option>
+              <option value="normal">Normal mesai</option>
+              <option value="shift">Vardiyalı çalışma</option>
+            </select>
+          </label>
+
+          <label>Haftalık normal süre (saat)
+            <input id="weeklyHours" type="number" min="1" max="168"
+              step="0.5" placeholder="Örn. 45" required>
+          </label>
+
+          <label>Fazla mesai katsayısı
+            <input id="overtimeMultiplier" type="number" min="1"
+              step="0.1" placeholder="Örn. 1.5" required>
+          </label>
+
+          <label>Hafta sonu katsayısı
+            <input id="weekendMultiplier" type="number" min="1"
+              step="0.1" placeholder="Kendi katsayını gir" required>
+          </label>
+
+          <label>Resmî tatil katsayısı
+            <input id="holidayMultiplier" type="number" min="1"
+              step="0.1" placeholder="Kendi katsayını gir" required>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="submit">Ayarları kaydet</button>
+        </div>
+
+        <p id="settingsMessage" role="status" aria-live="polite"></p>
+
+        <p class="notice">
+          MesaiMatik, girdiğin bilgilere göre tahmini sonuçlar sunar.
+          Girilen bilgilerin doğruluğunu kontrol et. Hesaplama yöntemi,
+          çalışma koşulları ve yürürlükteki mevzuat sonucu etkileyebilir.
+          Sonuçlar resmî bordro veya kesin ücret hesabı yerine geçmez.
+        </p>
+      </form>
+    </section>
+
+    <div id="appContent" hidden>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span>Çalışılan süre</span>
+          <strong id="totalHours">0 sa 00 dk</strong>
+        </article>
+
+        <article class="summary-card">
+          <span>Ek çalışma süresi</span>
+          <strong id="extraHours">0 sa 00 dk</strong>
+        </article>
+
+        <article class="summary-card accent">
+          <span>Tahmini ek ücret</span>
+          <strong id="extraPay">₺0,00</strong>
+        </article>
+
+        <article class="summary-card">
+          <span>Tahmini toplam</span>
+          <strong id="estimatedTotal">₺0,00</strong>
+        </article>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">02 / GÜNLÜK KAYIT</p>
+        <h2>Çalışma günü ekle</h2>
+
+        <form id="workForm">
+          <div class="grid">
+            <label>Tarih
+              <input id="workDate" type="date" required>
+            </label>
+
+            <label>Giriş saati
+              <input id="startTime" type="time" value="09:00" required>
+            </label>
+
+            <label>Çıkış saati
+              <input id="endTime" type="time" value="18:00" required>
+            </label>
+
+            <label>Gün türü
+              <select id="dayType" required>
+                <option value="normal">Normal gün</option>
+                <option value="weekend">Hafta tatili / hafta sonu</option>
+                <option value="holiday">Resmî tatil</option>
+              </select>
+            </label>
+
+            <label>Vardiya notu (isteğe bağlı)
+              <input id="shiftNote" type="text" maxlength="80"
+                placeholder="Örn. Gece vardiyası">
+            </label>
+          </div>
+
+          <div class="actions">
+            <button class="primary" type="submit">＋ Kaydı ekle</button>
+            <button class="secondary" id="clearMonth" type="button">
+              Seçili ayı temizle
+            </button>
+          </div>
+
+          <p id="formMessage" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="list-heading">
+          <div>
+            <p class="eyebrow">03 / KAYITLAR</p>
+            <h2>Çalışma geçmişi</h2>
+          </div>
+          <span id="recordCount">0 kayıt</span>
+        </div>
+
+        <label>Raporlanacak ay
+          <input id="reportMonth" type="month">
+        </label>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Çalışma</th>
+                <th>Süre</th>
+                <th>Ek süre</th>
+                <th>Gün türü</th>
+                <th>Ek ücret</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+
+        <p id="emptyState">
+          Henüz kayıt yok. İlk çalışma gününü ekleyerek başlayabilirsin.
+        </p>
+      </section>
+
+    </div>
+
+    <footer>MesaiMatik · Planla · Kaydet · Hesapla</footer>
+
+  </main>
+</body>
+</html>
